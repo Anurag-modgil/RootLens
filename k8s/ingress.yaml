@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rootlens-ingress
+  namespace: rootlens
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/websocket-services: "rootlens-web"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - rootlens.local
+      secretName: rootlens-tls-secret
+  rules:
+    - host: rootlens.local
+      http:
+        paths:
+          # API traffic
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: rootlens-web
+                port:
+                  number: 8000
+          # WebSockets stream
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: rootlens-web
+                port:
+                  number: 8000
+          # UI interface (static proxy)
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rootlens-web
+                port:
+                  number: 8000

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Log
 from app.schemas import LogCreate, IngestSuccessResponse
-from app.tasks import process_log_embedding_task
+from app.agents.orchestrator import orchestrator
 
 router = APIRouter(prefix="/api/v1", tags=["Logs"])
 
@@ -20,8 +20,8 @@ def ingest_log(log_in: LogCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_log)
         
-        # Dispatch Celery task for background embedding and indexing
-        process_log_embedding_task.delay(db_log.id)
+        # Dispatch to the SRE Multi-Agent Orchestrator
+        orchestrator.dispatch_event("raw_log_ingested", {"log_id": db_log.id})
         
         return IngestSuccessResponse(
             status="success",

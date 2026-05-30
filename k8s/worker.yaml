@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rootlens-worker
+  namespace: rootlens
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rootlens-worker
+  template:
+    metadata:
+      labels:
+        app: rootlens-worker
+    spec:
+      containers:
+        - name: worker
+          image: rootlens-app:latest
+          imagePullPolicy: IfNotPresent
+          command: ["celery", "-A", "app.tasks.celery_app", "worker", "--loglevel=info"]
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:supersecretpassword@postgres:5432/rootlens
+            - name: QDRANT_URL
+              value: http://qdrant:6333
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: CELERY_ALWAYS_EAGER
+              value: "False"
+            - name: OPENAI_API_KEY
+              value: "mock-key"

@@ -10,3 +10,8 @@ qdrant_storage/
 
 # OS
 .DS_Store
+
+# Node / JS
+node_modules/
+dist/
+

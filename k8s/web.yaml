@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rootlens-web
+  namespace: rootlens
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: rootlens-web
+  template:
+    metadata:
+      labels:
+        app: rootlens-web
+    spec:
+      containers:
+        - name: web
+          image: rootlens-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:supersecretpassword@postgres:5432/rootlens
+            - name: QDRANT_URL
+              value: http://qdrant:6333
+            - name: CELERY_BROKER_URL
+              value: redis://redis:6379/0
+            - name: CELERY_RESULT_BACKEND
+              value: redis://redis:6379/0
+            - name: CELERY_ALWAYS_EAGER
+              value: "False"
+            - name: OPENAI_API_KEY
+              value: "mock-key"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rootlens-web
+  namespace: rootlens
+spec:
+  ports:
+    - port: 8000
+      targetPort: 8000
+  selector:
+    app: rootlens-web
