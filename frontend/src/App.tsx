@@ -32,6 +32,9 @@ const initialStats: Stats = {
   ingestion_trend: []
 };
 
+const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
+const WS_BASE = (import.meta.env.VITE_WS_BASE_URL as string) || "";
+
 function App() {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [stats, setStats] = useState<Stats>(initialStats);
@@ -41,7 +44,7 @@ function App() {
   // Fetch general stats
   const fetchOverviewStats = async () => {
     try {
-      const res = await fetch('/api/v1/dashboard/overview');
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/overview`);
       if (res.ok) {
         const data = await res.json();
         setStats(data);
@@ -56,8 +59,11 @@ function App() {
     let ws: WebSocket;
     const connectWS = () => {
       setWsStatus('connecting');
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/updates`;
+      let wsUrl = WS_BASE;
+      if (!wsUrl) {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${protocol}//${window.location.host}/ws/updates`;
+      }
       
       console.log(`Connecting to SRE Agent WebSocket at: ${wsUrl}`);
       ws = new WebSocket(wsUrl);
@@ -116,7 +122,7 @@ function App() {
 
   const handleApproveRemediation = async (incidentId: number): Promise<boolean> => {
     try {
-      const res = await fetch(`/api/v1/dashboard/incidents/${incidentId}/approve`, {
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/incidents/${incidentId}/approve`, {
         method: 'POST',
       });
       if (res.ok) {

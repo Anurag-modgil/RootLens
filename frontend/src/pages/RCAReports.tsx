@@ -45,9 +45,11 @@ export const RCAReports: React.FC = () => {
   // Actually, we can fetch all details and render a premium, dynamic SRE RCA report!
   // To make it look extremely premium, if the description contains RCA details we can parse it, or we can mock/simulate an SRE summary of the root cause based on the description and severity.
   
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
+
   const fetchIncidents = async () => {
     try {
-      const res = await fetch('/api/v1/dashboard/incidents');
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/incidents`);
       if (res.ok) {
         const data = await res.json();
         setIncidents(data);
@@ -63,7 +65,7 @@ export const RCAReports: React.FC = () => {
   const fetchDetails = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/dashboard/incidents/${id}`);
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/incidents/${id}`);
       if (res.ok) {
         const data = await res.json();
         setDetails(data);

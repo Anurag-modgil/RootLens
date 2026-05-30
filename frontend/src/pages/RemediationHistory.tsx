@@ -13,10 +13,12 @@ export const RemediationHistory: React.FC = () => {
   const [history, setHistory] = useState<RemediationRecord[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
+
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/dashboard/remediations');
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/remediations`);
       if (res.ok) {
         const data = await res.json();
         setHistory(data);

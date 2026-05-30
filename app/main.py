@@ -24,10 +24,21 @@ orchestrator.register_agent(verification_agent)
 # Store remediation_agent on orchestrator class for manual approval triggering
 orchestrator.remediation_agent = remediation_agent
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title=settings.app_name,
     debug=settings.debug,
     version="1.0.0"
+)
+
+# Add CORS middleware to support cross-origin dashboard requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Prometheus Metrics definitions

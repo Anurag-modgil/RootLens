@@ -52,9 +52,11 @@ export const Incidents: React.FC<IncidentsProps> = ({ onApproveRemediation }) =>
   const [loading, setLoading] = useState<boolean>(false);
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
+
   const fetchIncidents = async () => {
     try {
-      let url = '/api/v1/dashboard/incidents';
+      let url = `${API_BASE}/api/v1/dashboard/incidents`;
       const params = [];
       if (severityFilter) params.push(`severity=${severityFilter}`);
       if (statusFilter) params.push(`status=${statusFilter}`);
@@ -73,7 +75,7 @@ export const Incidents: React.FC<IncidentsProps> = ({ onApproveRemediation }) =>
   const fetchIncidentDetails = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/dashboard/incidents/${id}`);
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/incidents/${id}`);
       if (res.ok) {
         const data = await res.json();
         setDetails(data);

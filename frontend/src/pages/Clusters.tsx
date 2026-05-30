@@ -23,10 +23,12 @@ export const Clusters: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string) || "";
+
   const fetchClusters = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/dashboard/clusters');
+      const res = await fetch(`${API_BASE}/api/v1/dashboard/clusters`);
       if (res.ok) {
         const data = await res.json();
         setClusters(data);
