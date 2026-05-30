@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     celery_result_backend: str = Field(default="redis://localhost:6379/0", env="CELERY_RESULT_BACKEND")
     celery_always_eager: bool = Field(default=True, env="CELERY_ALWAYS_EAGER")
 
+    # OpenAI configurations
+    openai_api_key: str = Field(default="mock-key", env="OPENAI_API_KEY")
+    openai_model: str = Field(default="gpt-4o-mini", env="OPENAI_MODEL")
+
     class Config:
         env_file = ".env"
 
