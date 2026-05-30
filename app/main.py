@@ -3,8 +3,7 @@ from app.config import settings
 from app.database import engine, Base
 from app.api.logs import router as logs_router
 
-# Create database tables (for SQLite or local Postgres if connected)
-Base.metadata.create_all(bind=engine)
+# Database tables are managed via Alembic migrations
 
 app = FastAPI(
     title=settings.app_name,
