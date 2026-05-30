@@ -23,11 +23,15 @@ class VectorStoreService:
             self.collection_name = settings.qdrant_collection
             logger.info(f"Initializing Qdrant client at '{settings.qdrant_url}'...")
             try:
-                # If setting is :memory:, it runs completely in-memory
                 if settings.qdrant_url == ":memory:":
                     self._client = QdrantClient(location=":memory:")
-                else:
+                elif (settings.qdrant_url.startswith("http://") or 
+                      settings.qdrant_url.startswith("https://") or 
+                      settings.qdrant_url.startswith("grpc://")):
                     self._client = QdrantClient(url=settings.qdrant_url)
+                else:
+                    # Treat as local directory storage path (e.g., "qdrant_storage")
+                    self._client = QdrantClient(path=settings.qdrant_url)
                 
                 self._ensure_collection()
             except Exception as e:

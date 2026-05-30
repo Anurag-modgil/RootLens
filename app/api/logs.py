@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Log
 from app.schemas import LogCreate, IngestSuccessResponse
+from app.tasks import process_log_embedding_task
 
 router = APIRouter(prefix="/api/v1", tags=["Logs"])
 
@@ -18,6 +19,10 @@ def ingest_log(log_in: LogCreate, db: Session = Depends(get_db)):
         db.add(db_log)
         db.commit()
         db.refresh(db_log)
+        
+        # Dispatch Celery task for background embedding and indexing
+        process_log_embedding_task.delay(db_log.id)
+        
         return IngestSuccessResponse(
             status="success",
             message="Log ingested successfully",
